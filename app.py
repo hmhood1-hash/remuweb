@@ -12,7 +12,7 @@ db.init_app(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'auth.login'  # ← CORREGIDO: usar nombre del blueprint
+login_manager.login_view = 'auth.login'
 login_manager.login_message = 'Por favor inicia sesión para acceder a esta página.'
 login_manager.login_message_category = 'info'
 
@@ -21,18 +21,17 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # Registrar blueprints
-def register_blueprints():
-    from routes.auth import auth_bp
-    from routes.dashboard import dashboard_bp
-    from routes.employees import employees_bp
-    from routes.payroll import payroll_bp
-    from routes.reports import reports_bp
-    
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(dashboard_bp)
-    app.register_blueprint(employees_bp)
-    app.register_blueprint(payroll_bp)
-    app.register_blueprint(reports_bp)
+from routes.auth import auth_bp
+from routes.dashboard import dashboard_bp
+from routes.employees import employees_bp
+from routes.payroll import payroll_bp
+from routes.reports import reports_bp
+
+app.register_blueprint(auth_bp)
+app.register_blueprint(dashboard_bp)
+app.register_blueprint(employees_bp)
+app.register_blueprint(payroll_bp)
+app.register_blueprint(reports_bp)
 
 @app.before_request
 def before_request():
@@ -53,11 +52,9 @@ def internal_error(error):
     db.session.rollback()
     return render_template('errors/500.html'), 500
 
-def create_app():
-    """Factory function para crear la aplicación"""
+if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        register_blueprints()
         
         # Crear usuario admin por defecto si no existe
         if User.query.filter_by(username='admin').first() is None:
@@ -66,8 +63,4 @@ def create_app():
             db.session.add(admin)
             db.session.commit()
     
-    return app
-
-if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True, port=5000)
