@@ -14,9 +14,16 @@
         <div class="card">
             <div class="card-body">
                 <form method="POST">
-                    <div class="mb-3">
-                        <label for="full_name" class="form-label">Nombre Completo</label>
-                        <input type="text" class="form-control" id="full_name" name="full_name" value="{{ employee.full_name if employee else '' }}" required>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ employee.first_name if employee else '' }}" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ employee.last_name if employee else '' }}" required>
+                        </div>
                     </div>
                     
                     <div class="mb-3">
@@ -40,13 +47,13 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="base_salary" class="form-label">Salario Base</label>
-                        <input type="number" class="form-control" id="base_salary" name="base_salary" step="0.01" value="{{ employee.base_salary if employee else '' }}" required>
+                        <label for="department" class="form-label">Departamento</label>
+                        <input type="text" class="form-control" id="department" name="department" value="{{ employee.department if employee else '' }}">
                     </div>
                     
                     <div class="mb-3">
-                        <label for="hire_date" class="form-label">Fecha de Contratación</label>
-                        <input type="date" class="form-control" id="hire_date" name="hire_date" value="{{ employee.hire_date.strftime('%Y-%m-%d') if employee and employee.hire_date else '' }}" required>
+                        <label for="base_salary" class="form-label">Salario Base</label>
+                        <input type="number" class="form-control" id="base_salary" name="base_salary" step="0.01" value="{{ employee.base_salary if employee else '' }}" required>
                     </div>
                     
                     <div class="mb-3 form-check">
