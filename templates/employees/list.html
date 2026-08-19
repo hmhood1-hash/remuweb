@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Empleados - Sistema de Nómina{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>Empleados</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('employees.create_employee') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Nuevo Empleado
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if employees %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Cédula</th>
+                        <th>Email</th>
+                        <th>Puesto</th>
+                        <th>Salario Base</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.full_name }}</td>
+                        <td>{{ employee.id_number }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>{{ employee.position }}</td>
+                        <td>${{ "%.2f"|format(employee.base_salary) }}</td>
+                        <td>
+                            {% if employee.is_active %}
+                            <span class="badge bg-success">Activo</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('employees.edit_employee', employee_id=employee.id) }}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{{ url_for('employees.delete_employee', employee_id=employee.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No hay empleados registrados.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

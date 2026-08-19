@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Nóminas - Sistema de Nómina{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2>Nóminas</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('payroll.create_payroll') }}" class="btn btn-primary">
+            <i class="bi bi-file-earmark-plus"></i> Nueva Nómina
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if payrolls %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Empleado</th>
+                        <th>Período</th>
+                        <th>Salario Bruto</th>
+                        <th>Descuentos</th>
+                        <th>Salario Neto</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payroll in payrolls %}
+                    <tr>
+                        <td>{{ payroll.employee.full_name }}</td>
+                        <td>{{ payroll.period_start.strftime('%d/%m/%Y') }} - {{ payroll.period_end.strftime('%d/%m/%Y') }}</td>
+                        <td>${{ "%.2f"|format(payroll.gross_salary) }}</td>
+                        <td>${{ "%.2f"|format(payroll.total_discounts) }}</td>
+                        <td><strong>${{ "%.2f"|format(payroll.net_salary) }}</strong></td>
+                        <td>
+                            {% if payroll.status == 'draft' %}
+                            <span class="badge bg-secondary">Borrador</span>
+                            {% elif payroll.status == 'processed' %}
+                            <span class="badge bg-success">Procesada</span>
+                            {% elif payroll.status == 'paid' %}
+                            <span class="badge bg-primary">Pagada</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('payroll.edit_payroll', payroll_id=payroll.id) }}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{{ url_for('payroll.delete_payroll', payroll_id=payroll.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">No hay nóminas registradas.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
