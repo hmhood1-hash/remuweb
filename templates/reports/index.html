@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes - Sistema de Nómina{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-bar-chart"></i> Reportes</h2>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-calendar-month display-4 text-primary mb-3"></i>
+                <h5 class="card-title">Reporte Mensual</h5>
+                <p class="text-muted">Consulta el resumen de nóminas por mes.</p>
+                <a href="{{ url_for('reports.monthly_report') }}" class="btn btn-primary">
+                    Ver Reporte
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-person-lines-fill display-4 text-success mb-3"></i>
+                <h5 class="card-title">Reporte por Empleado</h5>
+                <p class="text-muted">Historial de pagos de un empleado específico.</p>
+                <a href="{{ url_for('employees.list_employees') }}" class="btn btn-success">
+                    Seleccionar Empleado
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-file-earmark-excel display-4 text-warning mb-3"></i>
+                <h5 class="card-title">Exportar a Excel</h5>
+                <p class="text-muted">Descarga el reporte del mes actual en Excel.</p>
+                <a href="{{ url_for('reports.export_monthly_excel') }}" class="btn btn-warning">
+                    Exportar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
