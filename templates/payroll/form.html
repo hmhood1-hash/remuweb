@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{% if payroll %}Editar Nómina{% else %}Nueva Nómina{% endif %} - Sistema de Nómina{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-file-earmark-plus"></i> {% if payroll %}Editar Nómina{% else %}Nueva Nómina{% endif %}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="row g-3">
+                        {% if not payroll %}
+                        <div class="col-md-12">
+                            <label for="employee_id" class="form-label">Empleado</label>
+                            <select class="form-select" id="employee_id" name="employee_id" required>
+                                <option value="">Selecciona un empleado...</option>
+                                {% for emp in employees %}
+                                <option value="{{ emp.id }}">{{ emp.first_name }} {{ emp.last_name }} - {{ emp.position }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="period_start" class="form-label">Inicio del Período</label>
+                            <input type="date" class="form-control" id="period_start" name="period_start"
+                                   value="{{ default_start if default_start else '' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="period_end" class="form-label">Fin del Período</label>
+                            <input type="date" class="form-control" id="period_end" name="period_end"
+                                   value="{{ default_end if default_end else '' }}" required>
+                        </div>
+                        {% else %}
+                        <div class="col-md-12">
+                            <label class="form-label">Empleado</label>
+                            <input type="text" class="form-control" value="{{ payroll.employee.first_name }} {{ payroll.employee.last_name }}" disabled>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-md-6">
+                            <label for="overtime_hours" class="form-label">Horas Extra</label>
+                            <input type="number" step="0.5" min="0" class="form-control" id="overtime_hours" name="overtime_hours"
+                                   value="{{ payroll.overtime_hours if payroll else 0 }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bonuses" class="form-label">Bonificaciones</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="bonuses" name="bonuses"
+                                       value="{{ payroll.bonuses if payroll else 0 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="other_discounts" class="form-label">Otros Descuentos</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step="0.01" min="0" class="form-control" id="other_discounts" name="other_discounts"
+                                       value="{{ payroll.other_discounts if payroll else 0 }}">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="notes" class="form-label">Notas</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ payroll.notes if payroll else '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                        <a href="{{ url_for('payroll.list_payrolls') }}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
