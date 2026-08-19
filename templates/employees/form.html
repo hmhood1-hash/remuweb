@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Formulario de Empleado - Sistema de Nómina{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>{% if employee %}Editar Empleado{% else %}Nuevo Empleado{% endif %}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" value="{{ employee.full_name if employee else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_number" class="form-label">Cédula</label>
+                        <input type="text" class="form-control" id="id_number" name="id_number" value="{{ employee.id_number if employee else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ employee.email if employee else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="phone" name="phone" value="{{ employee.phone if employee else '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="position" class="form-label">Puesto</label>
+                        <input type="text" class="form-control" id="position" name="position" value="{{ employee.position if employee else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="base_salary" class="form-label">Salario Base</label>
+                        <input type="number" class="form-control" id="base_salary" name="base_salary" step="0.01" value="{{ employee.base_salary if employee else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hire_date" class="form-label">Fecha de Contratación</label>
+                        <input type="date" class="form-control" id="hire_date" name="hire_date" value="{{ employee.hire_date.strftime('%Y-%m-%d') if employee and employee.hire_date else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if not employee or employee.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active">
+                            Activo
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('employees.list_employees') }}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar Empleado</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

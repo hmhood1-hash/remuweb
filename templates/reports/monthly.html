@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte Mensual - Sistema de Nómina{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Reporte Mensual de Nóminas</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="year" class="form-label">Año</label>
+                        <input type="number" class="form-control" id="year" name="year" value="{{ year }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="month" class="form-label">Mes</label>
+                        <select class="form-select" id="month" name="month" required>
+                            <option value="1" {% if month == 1 %}selected{% endif %}>Enero</option>
+                            <option value="2" {% if month == 2 %}selected{% endif %}>Febrero</option>
+                            <option value="3" {% if month == 3 %}selected{% endif %}>Marzo</option>
+                            <option value="4" {% if month == 4 %}selected{% endif %}>Abril</option>
+                            <option value="5" {% if month == 5 %}selected{% endif %}>Mayo</option>
+                            <option value="6" {% if month == 6 %}selected{% endif %}>Junio</option>
+                            <option value="7" {% if month == 7 %}selected{% endif %}>Julio</option>
+                            <option value="8" {% if month == 8 %}selected{% endif %}>Agosto</option>
+                            <option value="9" {% if month == 9 %}selected{% endif %}>Septiembre</option>
+                            <option value="10" {% if month == 10 %}selected{% endif %}>Octubre</option>
+                            <option value="11" {% if month == 11 %}selected{% endif %}>Noviembre</option>
+                            <option value="12" {% if month == 12 %}selected{% endif %}>Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary">Filtrar Reporte</button>
+                        <a href="{{ url_for('reports.export_monthly_excel', year=year, month=month) }}" class="btn btn-success">Exportar a Excel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Nóminas del período {{ month }}/{{ year }}</h5>
+            </div>
+            <div class="card-body">
+                {% if payrolls %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Empleado</th>
+                                <th>Salario Base</th>
+                                <th>Horas Extras</th>
+                                <th>Bonificaciones</th>
+                                <th>Bruto</th>
+                                <th>Impuesto</th>
+                                <th>AFP</th>
+                                <th>Seguro</th>
+                                <th>Total Desc.</th>
+                                <th>Neto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payroll in payrolls %}
+                            <tr>
+                                <td>{{ payroll.employee.full_name }}</td>
+                                <td>${{ "%.2f"|format(payroll.base_salary) }}</td>
+                                <td>${{ "%.2f"|format(payroll.overtime_pay) }}</td>
+                                <td>${{ "%.2f"|format(payroll.bonuses) }}</td>
+                                <td><strong>${{ "%.2f"|format(payroll.gross_salary) }}</strong></td>
+                                <td>${{ "%.2f"|format(payroll.income_tax) }}</td>
+                                <td>${{ "%.2f"|format(payroll.afp) }}</td>
+                                <td>${{ "%.2f"|format(payroll.insurance) }}</td>
+                                <td>${{ "%.2f"|format(payroll.total_discounts) }}</td>
+                                <td><strong>${{ "%.2f"|format(payroll.net_salary) }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-active">
+                                <td><strong>TOTAL</strong></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><strong>${{ "%.2f"|format(total_gross) }}</strong></td>
+                                <td><strong>${{ "%.2f"|format(total_tax) }}</strong></td>
+                                <td><strong>${{ "%.2f"|format(total_afp) }}</strong></td>
+                                <td><strong>${{ "%.2f"|format(total_insurance) }}</strong></td>
+                                <td><strong>${{ "%.2f"|format(total_discounts) }}</strong></td>
+                                <td><strong>${{ "%.2f"|format(total_net) }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay nóminas para el período seleccionado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

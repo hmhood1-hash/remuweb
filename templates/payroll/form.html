@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Formulario de Nómina - Sistema de Nómina{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>{% if payroll %}Editar Nómina{% else %}Nueva Nómina{% endif %}</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="employee_id" class="form-label">Empleado</label>
+                        <select class="form-select" id="employee_id" name="employee_id" required>
+                            <option value="">Selecciona un empleado</option>
+                            {% for emp in employees %}
+                            <option value="{{ emp.id }}" {% if payroll and payroll.employee_id == emp.id %}selected{% endif %}>{{ emp.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="period_start" class="form-label">Fecha Inicio del Período</label>
+                        <input type="date" class="form-control" id="period_start" name="period_start" value="{{ payroll.period_start.strftime('%Y-%m-%d') if payroll else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="period_end" class="form-label">Fecha Fin del Período</label>
+                        <input type="date" class="form-control" id="period_end" name="period_end" value="{{ payroll.period_end.strftime('%Y-%m-%d') if payroll else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="base_salary" class="form-label">Salario Base</label>
+                        <input type="number" class="form-control" id="base_salary" name="base_salary" step="0.01" value="{{ payroll.base_salary if payroll else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="overtime_pay" class="form-label">Pago de Horas Extras</label>
+                        <input type="number" class="form-control" id="overtime_pay" name="overtime_pay" step="0.01" value="{{ payroll.overtime_pay if payroll else '0' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="bonuses" class="form-label">Bonificaciones</label>
+                        <input type="number" class="form-control" id="bonuses" name="bonuses" step="0.01" value="{{ payroll.bonuses if payroll else '0' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="income_tax" class="form-label">Impuesto a la Renta</label>
+                        <input type="number" class="form-control" id="income_tax" name="income_tax" step="0.01" value="{{ payroll.income_tax if payroll else '0' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="afp" class="form-label">AFP</label>
+                        <input type="number" class="form-control" id="afp" name="afp" step="0.01" value="{{ payroll.afp if payroll else '0' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="insurance" class="form-label">Seguro</label>
+                        <input type="number" class="form-control" id="insurance" name="insurance" step="0.01" value="{{ payroll.insurance if payroll else '0' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="other_discounts" class="form-label">Otros Descuentos</label>
+                        <input type="number" class="form-control" id="other_discounts" name="other_discounts" step="0.01" value="{{ payroll.other_discounts if payroll else '0' }}">
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('payroll.list_payrolls') }}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar Nómina</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
