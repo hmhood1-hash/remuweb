@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request, send_file
+from flask import Blueprint, render_template, request, send_file, redirect, url_for
 from flask_login import login_required, current_user
 from models import db, Employee, Payroll
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from functools import wraps
 from io import BytesIO
 import openpyxl
@@ -20,7 +20,7 @@ def admin_or_hr_required(f):
 @reports_bp.route('/')
 @login_required
 @admin_or_hr_required
-def index():
+def list_reports():
     """Página de reportes"""
     return render_template('reports/index.html')
 
@@ -33,7 +33,6 @@ def monthly_report():
     month = request.args.get('month', datetime.now().month, type=int)
     
     # Generar fecha de inicio y fin
-    from datetime import date
     first_day = date(year, month, 1)
     if month == 12:
         last_day = date(year + 1, 1, 1) - timedelta(days=1)
@@ -90,7 +89,6 @@ def export_monthly_excel():
     year = request.args.get('year', datetime.now().year, type=int)
     month = request.args.get('month', datetime.now().month, type=int)
     
-    from datetime import date, timedelta
     first_day = date(year, month, 1)
     if month == 12:
         last_day = date(year + 1, 1, 1) - timedelta(days=1)
