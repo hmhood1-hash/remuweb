@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sistema de Nómina{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2>Dashboard</h2>
+        <p class="text-muted">Bienvenido {{ current_user.username }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Total de Empleados</h5>
+                <h2 class="text-primary">{{ total_employees }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Total de Nóminas</h5>
+                <h2 class="text-success">{{ total_payrolls }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Costo de Nómina</h5>
+                <h2 class="text-info">{{ "%.2f"|format(total_salary_cost) }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Tu Rol</h5>
+                <h2 class="text-warning" style="text-transform: capitalize;">{{ current_user.role }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Últimas Nóminas Registradas</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_payrolls %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Empleado</th>
+                                <th>Período</th>
+                                <th>Salario Bruto</th>
+                                <th>Descuentos</th>
+                                <th>Salario Neto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payroll in recent_payrolls %}
+                            <tr>
+                                <td>{{ payroll.employee.full_name }}</td>
+                                <td>{{ payroll.period_start.strftime('%d/%m/%Y') }} - {{ payroll.period_end.strftime('%d/%m/%Y') }}</td>
+                                <td>${{ "%.2f"|format(payroll.gross_salary) }}</td>
+                                <td>${{ "%.2f"|format(payroll.total_discounts) }}</td>
+                                <td><strong>${{ "%.2f"|format(payroll.net_salary) }}</strong></td>
+                                <td>
+                                    {% if payroll.status == 'draft' %}
+                                    <span class="badge bg-secondary">Borrador</span>
+                                    {% elif payroll.status == 'processed' %}
+                                    <span class="badge bg-success">Procesada</span>
+                                    {% elif payroll.status == 'paid' %}
+                                    <span class="badge bg-primary">Pagada</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay nóminas registradas aún.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
