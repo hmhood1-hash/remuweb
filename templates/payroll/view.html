@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Nómina - Sistema de Remuneraciones{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Detalle de Nómina</h2>
+        <p class="text-muted mb-0">{{ payroll.employee.full_name }} · {{ payroll.period_start.strftime('%d/%m/%Y') }} - {{ payroll.period_end.strftime('%d/%m/%Y') }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if current_user.role in ['admin', 'hr'] %}
+        <a href="{{ url_for('payroll.edit_payroll', payroll_id=payroll.id) }}" class="btn btn-warning"><i class="bi bi-pencil me-1"></i>Editar</a>
+        {% endif %}
+        <a href="{{ url_for('payroll.download_payroll_pdf', payroll_id=payroll.id) }}" class="btn btn-outline-primary"><i class="bi bi-file-earmark-pdf me-1"></i>PDF</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h5 class="mb-0">Resumen de haberes y descuentos</h5></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <tbody>
+                            <tr><th>Salario base</th><td class="text-end">${{ "%.0f"|format(payroll.base_salary) }}</td></tr>
+                            <tr><th>Horas extras</th><td class="text-end">{{ payroll.overtime_hours or 0 }}</td></tr>
+                            <tr><th>Pago horas extras</th><td class="text-end">${{ "%.0f"|format(payroll.overtime_pay) }}</td></tr>
+                            <tr><th>Bonificaciones</th><td class="text-end">${{ "%.0f"|format(payroll.bonuses) }}</td></tr>
+                            <tr class="table-light"><th>Salario bruto</th><td class="text-end fw-bold">${{ "%.0f"|format(payroll.gross_salary) }}</td></tr>
+                            <tr><th>Impuesto a la renta</th><td class="text-end">${{ "%.0f"|format(payroll.income_tax) }}</td></tr>
+                            <tr><th>AFP</th><td class="text-end">${{ "%.0f"|format(payroll.afp) }}</td></tr>
+                            <tr><th>Salud / seguro</th><td class="text-end">${{ "%.0f"|format(payroll.insurance) }}</td></tr>
+                            <tr><th>Otros descuentos</th><td class="text-end">${{ "%.0f"|format(payroll.other_discounts) }}</td></tr>
+                            <tr class="table-light"><th>Total descuentos</th><td class="text-end fw-bold">${{ "%.0f"|format(payroll.total_discounts) }}</td></tr>
+                            <tr class="table-primary"><th>Salario neto</th><td class="text-end fw-bold">${{ "%.0f"|format(payroll.net_salary) }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white"><h5 class="mb-0">Estado</h5></div>
+            <div class="card-body">
+                <p><strong>Estado actual:</strong>
+                    <span class="badge {% if payroll.status == 'draft' %}bg-secondary{% elif payroll.status == 'processed' %}bg-success{% else %}bg-primary{% endif %}">
+                        {{ payroll.status|title }}
+                    </span>
+                </p>
+                <p><strong>Creada:</strong> {{ payroll.created_at.strftime('%d/%m/%Y %H:%M') if payroll.created_at else '-' }}</p>
+                <p><strong>Procesada:</strong> {{ payroll.processed_at.strftime('%d/%m/%Y %H:%M') if payroll.processed_at else 'Pendiente' }}</p>
+                {% if current_user.role in ['admin', 'hr'] and payroll.status == 'draft' %}
+                <form method="POST" action="{{ url_for('payroll.process_payroll', payroll_id=payroll.id) }}">
+                    <input type="hidden" name="csrf_token" value="">
+                    <button type="submit" class="btn btn-success w-100">Procesar nómina</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h5 class="mb-0">Empleado</h5></div>
+            <div class="card-body">
+                <p class="mb-1 fw-semibold">{{ payroll.employee.full_name }}</p>
+                <p class="text-muted mb-1">{{ payroll.employee.position }}</p>
+                <p class="text-muted mb-3">{{ payroll.employee.department or 'Sin departamento' }}</p>
+                <a href="{{ url_for('employees.view_employee', employee_id=payroll.employee.id) }}" class="btn btn-outline-secondary w-100">Ver ficha</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if payroll.notes %}
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-header bg-white"><h5 class="mb-0">Notas</h5></div>
+    <div class="card-body">{{ payroll.notes }}</div>
+</div>
+{% endif %}
+{% endblock %}

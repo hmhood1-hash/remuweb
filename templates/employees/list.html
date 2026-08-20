@@ -1,57 +1,60 @@
 {% extends "base.html" %}
 
-{% block title %}Empleados - Sistema de Nómina{% endblock %}
+{% block title %}Empleados - Sistema de Remuneraciones{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-8">
-        <h2>Empleados</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Empleados</h2>
+        <p class="text-muted mb-0">Administra fichas, estado laboral y datos previsionales.</p>
     </div>
-    <div class="col-md-4 text-end">
-        <a href="{{ url_for('employees.create_employee') }}" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> Nuevo Empleado
-        </a>
-    </div>
+    <a href="{{ url_for('employees.create_employee') }}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Nuevo empleado</a>
 </div>
 
-<div class="card">
+<div class="card border-0 shadow-sm">
     <div class="card-body">
-        {% if employees %}
+        <form method="GET" class="row g-3 mb-4">
+            <div class="col-md-8">
+                <label for="search" class="form-label">Buscar</label>
+                <input type="text" class="form-control" id="search" name="search" value="{{ search }}" placeholder="Nombre, correo, RUT o cédula">
+            </div>
+            <div class="col-md-4 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-outline-primary">Buscar</button>
+                <a href="{{ url_for('employees.list_employees') }}" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </form>
+
+        {% if employees.items %}
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table align-middle">
                 <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Cédula</th>
-                        <th>Email</th>
-                        <th>Puesto</th>
-                        <th>Salario Base</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
+                    <tr><th>Nombre</th><th>Cédula</th><th>Email</th><th>Cargo</th><th>Sueldo base</th><th>Estado</th><th>Acciones</th></tr>
                 </thead>
                 <tbody>
-                    {% for employee in employees %}
+                    {% for employee in employees.items %}
                     <tr>
-                        <td>{{ employee.full_name }}</td>
+                        <td>
+                            <div class="fw-semibold">{{ employee.full_name }}</div>
+                            <div class="small text-muted">{{ employee.department or 'Sin departamento' }}</div>
+                        </td>
                         <td>{{ employee.id_number }}</td>
                         <td>{{ employee.email }}</td>
                         <td>{{ employee.position }}</td>
-                        <td>${{ "%.2f"|format(employee.base_salary) }}</td>
+                        <td>${{ "%.0f"|format(employee.base_salary) }}</td>
                         <td>
-                            {% if employee.is_active %}
-                            <span class="badge bg-success">Activo</span>
-                            {% else %}
-                            <span class="badge bg-danger">Inactivo</span>
-                            {% endif %}
+                            <span class="badge {% if employee.status == 'active' %}bg-success{% elif employee.status == 'leave' %}bg-warning text-dark{% elif employee.status == 'suspended' %}bg-secondary{% else %}bg-danger{% endif %}">
+                                {{ employee.status|replace('_', ' ')|title }}
+                            </span>
                         </td>
                         <td>
-                            <a href="{{ url_for('employees.edit_employee', employee_id=employee.id) }}" class="btn btn-sm btn-warning">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <a href="{{ url_for('employees.delete_employee', employee_id=employee.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">
-                                <i class="bi bi-trash"></i>
-                            </a>
+                            <div class="d-flex gap-2">
+                                <a href="{{ url_for('employees.view_employee', employee_id=employee.id) }}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                <a href="{{ url_for('employees.edit_employee', employee_id=employee.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                                <form method="POST" action="{{ url_for('employees.delete_employee', employee_id=employee.id) }}" onsubmit="return confirm('¿Estás seguro de desactivar este empleado?');">
+                                    <input type="hidden" name="csrf_token" value="">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Desactivar</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -59,7 +62,7 @@
             </table>
         </div>
         {% else %}
-        <p class="text-muted">No hay empleados registrados.</p>
+        <p class="text-muted mb-0">No hay empleados registrados.</p>
         {% endif %}
     </div>
 </div>

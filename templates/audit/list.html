@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Auditoría - Sistema de Remuneraciones{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="mb-1">Registro de auditoría</h2>
+    <p class="text-muted mb-0">Últimos 200 eventos relevantes del sistema.</p>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% if logs %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Entidad</th><th>ID</th><th>Descripción</th><th>IP</th></tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.created_at.strftime('%d/%m/%Y %H:%M') if log.created_at else '-' }}</td>
+                        <td>{{ log.user.username if log.user else 'Sistema' }}</td>
+                        <td><span class="badge bg-dark">{{ log.action }}</span></td>
+                        <td>{{ log.entity_type or '-' }}</td>
+                        <td>{{ log.entity_id or '-' }}</td>
+                        <td>{{ log.description or '-' }}</td>
+                        <td>{{ log.ip_address or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No hay eventos de auditoría registrados.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

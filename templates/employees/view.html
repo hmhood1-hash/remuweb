@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Ficha de Empleado - Sistema de Remuneraciones{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">{{ employee.full_name }}</h2>
+        <p class="text-muted mb-0">{{ employee.position }}{% if employee.department %} · {{ employee.department }}{% endif %}</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if current_user.role in ['admin', 'hr'] %}
+        <a href="{{ url_for('employees.edit_employee', employee_id=employee.id) }}" class="btn btn-warning">
+            <i class="bi bi-pencil me-1"></i>Editar
+        </a>
+        {% endif %}
+        <a href="{{ url_for('reports.employee_report', employee_id=employee.id) }}" class="btn btn-outline-primary">
+            <i class="bi bi-graph-up me-1"></i>Reporte
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Estado</div><div class="fw-bold mt-1"><span class="badge {% if employee.status == 'active' %}bg-success{% elif employee.status == 'leave' %}bg-warning text-dark{% elif employee.status == 'suspended' %}bg-secondary{% else %}bg-danger{% endif %}">{{ employee.status|replace('_', ' ')|title }}</span></div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Sueldo base</div><div class="fw-bold fs-5 mt-1">${{ "%.0f"|format(employee.base_salary) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Vacaciones</div><div class="fw-bold fs-5 mt-1">{{ employee.vacation_requests|length }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Préstamos</div><div class="fw-bold fs-5 mt-1">{{ employee.loans|length }}</div></div></div></div>
+</div>
+
+<ul class="nav nav-tabs" id="employeeTabs" role="tablist">
+    <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#personal" type="button">Info personal</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#salary-history" type="button">Historial salarial</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#vacations" type="button">Vacaciones</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#loans" type="button">Préstamos</button></li>
+    <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#payrolls" type="button">Nóminas</button></li>
+</ul>
+
+<div class="tab-content bg-white border border-top-0 rounded-bottom p-4 shadow-sm">
+    <div class="tab-pane fade show active" id="personal">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h5>Datos personales</h5>
+                <table class="table table-sm">
+                    <tr><th>Correo</th><td>{{ employee.email }}</td></tr>
+                    <tr><th>Teléfono</th><td>{{ employee.phone or '-' }}</td></tr>
+                    <tr><th>RUT / Cédula</th><td>{{ employee.id_number }}</td></tr>
+                    <tr><th>Fecha nacimiento</th><td>{{ employee.birth_date.strftime('%d/%m/%Y') if employee.birth_date else '-' }}</td></tr>
+                    <tr><th>Dirección</th><td>{{ employee.address or '-' }}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h5>Datos laborales y bancarios</h5>
+                <table class="table table-sm">
+                    <tr><th>Fecha ingreso</th><td>{{ employee.hire_date.strftime('%d/%m/%Y') if employee.hire_date else '-' }}</td></tr>
+                    <tr><th>AFP</th><td>{{ employee.afp_provider or '-' }}</td></tr>
+                    <tr><th>Salud</th><td>{{ employee.health_provider or '-' }}</td></tr>
+                    <tr><th>Banco</th><td>{{ employee.bank_name or '-' }}</td></tr>
+                    <tr><th>Cuenta</th><td>{{ employee.bank_account_type|replace('_', ' ')|title if employee.bank_account_type else '-' }}{% if employee.bank_account %} · {{ employee.bank_account }}{% endif %}</td></tr>
+                    <tr><th>Emergencia</th><td>{{ employee.emergency_contact_name or '-' }}{% if employee.emergency_contact_phone %} · {{ employee.emergency_contact_phone }}{% endif %}</td></tr>
+                </table>
+            </div>
+            <div class="col-12">
+                <h5>Notas</h5>
+                <div class="border rounded p-3 bg-light">{{ employee.notes or 'Sin observaciones registradas.' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="salary-history">
+        {% if employee.salary_history %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr><th>Fecha</th><th>Sueldo anterior</th><th>Nuevo sueldo</th><th>Motivo</th></tr>
+                </thead>
+                <tbody>
+                    {% for change in employee.salary_history %}
+                    <tr>
+                        <td>{{ change.change_date.strftime('%d/%m/%Y') if change.change_date else '-' }}</td>
+                        <td>${{ "%.0f"|format(change.old_salary) }}</td>
+                        <td>${{ "%.0f"|format(change.new_salary) }}</td>
+                        <td>{{ change.reason or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No hay cambios salariales registrados.</p>
+        {% endif %}
+    </div>
+
+    <div class="tab-pane fade" id="vacations">
+        {% if employee.vacation_requests %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr><th>Inicio</th><th>Término</th><th>Días</th><th>Estado</th><th>Motivo</th></tr>
+                </thead>
+                <tbody>
+                    {% for vacation in employee.vacation_requests|sort(attribute='created_at', reverse=True) %}
+                    <tr>
+                        <td>{{ vacation.start_date.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ vacation.end_date.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ vacation.days_requested }}</td>
+                        <td>
+                            <span class="badge {% if vacation.status == 'pending' %}bg-warning text-dark{% elif vacation.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">{{ vacation.status|title }}</span>
+                        </td>
+                        <td>{{ vacation.reason or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No hay solicitudes de vacaciones.</p>
+        {% endif %}
+    </div>
+
+    <div class="tab-pane fade" id="loans">
+        {% if employee.loans %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr><th>Creación</th><th>Monto</th><th>Cuota mensual</th><th>Saldo</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                    {% for loan in employee.loans|sort(attribute='created_at', reverse=True) %}
+                    <tr>
+                        <td>{{ loan.created_at.strftime('%d/%m/%Y') if loan.created_at else '-' }}</td>
+                        <td>${{ "%.0f"|format(loan.amount) }}</td>
+                        <td>${{ "%.0f"|format(loan.monthly_installment) }}</td>
+                        <td>${{ "%.0f"|format(loan.remaining_balance or 0) }}</td>
+                        <td><span class="badge {% if loan.status == 'active' %}bg-primary{% elif loan.status == 'paid' %}bg-secondary{% else %}bg-danger{% endif %}">{{ loan.status|title }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No hay préstamos registrados.</p>
+        {% endif %}
+    </div>
+
+    <div class="tab-pane fade" id="payrolls">
+        {% if payrolls %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr><th>Período</th><th>Bruto</th><th>Descuentos</th><th>Neto</th><th>Estado</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for payroll in payrolls %}
+                    <tr>
+                        <td>{{ payroll.period_start.strftime('%d/%m/%Y') }} - {{ payroll.period_end.strftime('%d/%m/%Y') }}</td>
+                        <td>${{ "%.0f"|format(payroll.gross_salary) }}</td>
+                        <td>${{ "%.0f"|format(payroll.total_discounts) }}</td>
+                        <td class="fw-semibold">${{ "%.0f"|format(payroll.net_salary) }}</td>
+                        <td>
+                            <span class="badge {% if payroll.status == 'draft' %}bg-secondary{% elif payroll.status == 'processed' %}bg-success{% else %}bg-primary{% endif %}">{{ payroll.status|title }}</span>
+                        </td>
+                        <td><a href="{{ url_for('payroll.view_payroll', payroll_id=payroll.id) }}" class="btn btn-sm btn-outline-primary">Ver</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No hay nóminas asociadas.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

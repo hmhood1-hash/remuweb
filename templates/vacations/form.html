@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Solicitud de Vacaciones{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h2 class="h4 mb-0">Solicitar vacaciones</h2></div>
+            <div class="card-body">
+                <form method="POST" class="row g-3">
+                    <input type="hidden" name="csrf_token" value="">
+                    {% if employees %}
+                    <div class="col-12">
+                        <label for="employee_id" class="form-label">Empleado</label>
+                        <select class="form-select" id="employee_id" name="employee_id" required>
+                            <option value="">Selecciona un empleado</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}">{{ employee.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-6">
+                        <label for="start_date" class="form-label">Fecha inicio</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="end_date" class="form-label">Fecha término</label>
+                        <input type="date" class="form-control" id="end_date" name="end_date" required>
+                    </div>
+                    <div class="col-12">
+                        <label for="reason" class="form-label">Motivo</label>
+                        <textarea class="form-control" id="reason" name="reason" rows="4" placeholder="Describe el período solicitado y observaciones relevantes"></textarea>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('vacations.list_vacations') }}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

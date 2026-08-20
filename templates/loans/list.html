@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Préstamos - Sistema de Remuneraciones{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Préstamos a empleados</h2>
+        <p class="text-muted mb-0">Controla cuotas, saldos y estado de cada préstamo.</p>
+    </div>
+    <a href="{{ url_for('loans.create_loan') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>Nuevo préstamo</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% if loans.items %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr><th>Empleado</th><th>Monto</th><th>Cuota mensual</th><th>Cuotas</th><th>Saldo pendiente</th><th>Estado</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for loan in loans.items %}
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">{{ loan.employee.full_name }}</div>
+                            <div class="small text-muted">{{ loan.purpose or 'Sin motivo' }}</div>
+                        </td>
+                        <td>${{ "%.0f"|format(loan.amount) }}</td>
+                        <td>${{ "%.0f"|format(loan.monthly_installment) }}</td>
+                        <td>{{ loan.paid_installments }} / {{ loan.total_installments }}</td>
+                        <td>${{ "%.0f"|format(loan.remaining_balance or 0) }}</td>
+                        <td><span class="badge {% if loan.status == 'active' %}bg-primary{% elif loan.status == 'paid' %}bg-secondary{% else %}bg-danger{% endif %}">{{ loan.status|title }}</span></td>
+                        <td>
+                            {% if loan.status == 'active' %}
+                            <form method="POST" action="{{ url_for('loans.pay_installment', loan_id=loan.id) }}">
+                                <input type="hidden" name="csrf_token" value="">
+                                <button type="submit" class="btn btn-sm btn-outline-success">Registrar cuota</button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No hay préstamos registrados.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

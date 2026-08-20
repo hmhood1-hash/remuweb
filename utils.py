@@ -145,3 +145,17 @@ def calculate_overtime_pay(hours, hourly_rate, overtime_multiplier):
     if hours > 0:
         return hours * hourly_rate * overtime_multiplier
     return 0
+
+
+
+def log_audit(db, current_user, action, entity_type, entity_id, description):
+    """Registra una acción en el log de auditoría"""
+    from models import AuditLog
+    log = AuditLog(
+        user_id=current_user.id,
+        action=action,
+        entity_type=entity_type,
+        entity_id=entity_id,
+        description=description
+    )
+    db.session.add(log)
