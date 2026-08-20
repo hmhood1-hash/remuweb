@@ -73,15 +73,15 @@
                             {% for payroll in payrolls %}
                             <tr>
                                 <td>{{ payroll.employee.full_name }}</td>
-                                <td>${{ "%.2f"|format(payroll.base_salary) }}</td>
-                                <td>${{ "%.2f"|format(payroll.overtime_pay) }}</td>
-                                <td>${{ "%.2f"|format(payroll.bonuses) }}</td>
-                                <td><strong>${{ "%.2f"|format(payroll.gross_salary) }}</strong></td>
-                                <td>${{ "%.2f"|format(payroll.income_tax) }}</td>
-                                <td>${{ "%.2f"|format(payroll.afp) }}</td>
-                                <td>${{ "%.2f"|format(payroll.insurance) }}</td>
-                                <td>${{ "%.2f"|format(payroll.total_discounts) }}</td>
-                                <td><strong>${{ "%.2f"|format(payroll.net_salary) }}</strong></td>
+                                <td>${{ "%.0f"|format(payroll.base_salary) }}</td>
+                                <td>${{ "%.0f"|format(payroll.overtime_pay) }}</td>
+                                <td>${{ "%.0f"|format(payroll.bonuses) }}</td>
+                                <td><strong>${{ "%.0f"|format(payroll.gross_salary) }}</strong></td>
+                                <td>${{ "%.0f"|format(payroll.income_tax) }}</td>
+                                <td>${{ "%.0f"|format(payroll.afp) }}</td>
+                                <td>${{ "%.0f"|format(payroll.insurance) }}</td>
+                                <td>${{ "%.0f"|format(payroll.total_discounts) }}</td>
+                                <td><strong>${{ "%.0f"|format(payroll.net_salary) }}</strong></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -91,12 +91,12 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td><strong>${{ "%.2f"|format(total_gross) }}</strong></td>
-                                <td><strong>${{ "%.2f"|format(total_tax) }}</strong></td>
-                                <td><strong>${{ "%.2f"|format(total_afp) }}</strong></td>
-                                <td><strong>${{ "%.2f"|format(total_insurance) }}</strong></td>
-                                <td><strong>${{ "%.2f"|format(total_discounts) }}</strong></td>
-                                <td><strong>${{ "%.2f"|format(total_net) }}</strong></td>
+                                <td><strong>${{ "%.0f"|format(total_gross) }}</strong></td>
+                                <td><strong>${{ "%.0f"|format(total_tax) }}</strong></td>
+                                <td><strong>${{ "%.0f"|format(total_afp) }}</strong></td>
+                                <td><strong>${{ "%.0f"|format(total_insurance) }}</strong></td>
+                                <td><strong>${{ "%.0f"|format(total_discounts) }}</strong></td>
+                                <td><strong>${{ "%.0f"|format(total_net) }}</strong></td>
                             </tr>
                         </tfoot>
                     </table>

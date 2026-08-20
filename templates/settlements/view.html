@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Finiquito - Sistema de Remuneraciones{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Finiquito de {{ settlement.employee.full_name }}</h2>
+        <p class="text-muted mb-0">Fecha de término: {{ settlement.termination_date.strftime('%d/%m/%Y') }}</p>
+    </div>
+    <a href="{{ url_for('settlements.list_settlements') }}" class="btn btn-outline-secondary">Volver</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h5 class="mb-0">Resumen</h5></div>
+            <div class="card-body">
+                <p><strong>Estado:</strong> <span class="badge {% if settlement.status == 'draft' %}bg-secondary{% elif settlement.status == 'approved' %}bg-success{% else %}bg-primary{% endif %}">{{ settlement.status|title }}</span></p>
+                <p><strong>Motivo:</strong> {{ settlement.termination_reason|replace('_', ' ')|title if settlement.termination_reason else '-' }}</p>
+                <p><strong>Años de servicio:</strong> {{ settlement.years_of_service }}</p>
+                <p><strong>Último sueldo:</strong> ${{ "%.0f"|format(settlement.last_salary) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h5 class="mb-0">Detalle del cálculo</h5></div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr><th>Indemnización</th><td class="text-end">${{ "%.0f"|format(settlement.severance_pay) }}</td></tr>
+                            <tr><th>Vacaciones pendientes</th><td class="text-end">{{ settlement.vacation_days_pending }}</td></tr>
+                            <tr><th>Pago vacaciones</th><td class="text-end">${{ "%.0f"|format(settlement.vacation_payment) }}</td></tr>
+                            <tr><th>Gratificación proporcional</th><td class="text-end">${{ "%.0f"|format(settlement.proportional_bonus) }}</td></tr>
+                            <tr class="table-light"><th>Total bruto</th><td class="text-end fw-bold">${{ "%.0f"|format(settlement.total_gross) }}</td></tr>
+                            <tr><th>Descuentos estimados</th><td class="text-end">${{ "%.0f"|format(settlement.total_discounts) }}</td></tr>
+                            <tr class="table-primary"><th>Total líquido</th><td class="text-end fw-bold">${{ "%.0f"|format(settlement.total_net) }}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-header bg-white"><h5 class="mb-0">Notas</h5></div>
+    <div class="card-body">{{ settlement.notes or 'Sin notas registradas.' }}</div>
+</div>
+{% endblock %}

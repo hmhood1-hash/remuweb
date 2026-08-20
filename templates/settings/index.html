@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración - Sistema de Remuneraciones{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+        <div class="mb-4">
+            <h2 class="mb-1">Configuración de parámetros</h2>
+            <p class="text-muted mb-0">Ajusta tasas referenciales usadas por los cálculos de remuneraciones.</p>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <form method="POST" class="row g-3">
+                    <input type="hidden" name="csrf_token" value="">
+                    <div class="col-md-6">
+                        <label class="form-label" for="discount_income_tax">Impuesto a la renta</label>
+                        <input class="form-control" type="number" step="0.0001" id="discount_income_tax" name="discount_income_tax" value="{{ config.DISCOUNT_INCOME_TAX }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="discount_afp">Tasa AFP</label>
+                        <input class="form-control" type="number" step="0.0001" id="discount_afp" name="discount_afp" value="{{ config.DISCOUNT_AFP }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="discount_insurance">Tasa salud / seguro</label>
+                        <input class="form-control" type="number" step="0.0001" id="discount_insurance" name="discount_insurance" value="{{ config.DISCOUNT_INSURANCE }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="overtime_multiplier">Multiplicador horas extra</label>
+                        <input class="form-control" type="number" step="0.01" id="overtime_multiplier" name="overtime_multiplier" value="{{ config.OVERTIME_MULTIPLIER }}">
+                    </div>
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Guardar parámetros</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

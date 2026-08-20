@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Finiquitos - Sistema de Remuneraciones{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Finiquitos</h2>
+        <p class="text-muted mb-0">Revisa cálculos y estado de terminaciones laborales.</p>
+    </div>
+    <a href="{{ url_for('settlements.create_settlement') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>Nuevo finiquito</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        {% if settlements %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr><th>Empleado</th><th>Fecha término</th><th>Motivo</th><th>Total bruto</th><th>Total neto</th><th>Estado</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for settlement in settlements %}
+                    <tr>
+                        <td>{{ settlement.employee.full_name }}</td>
+                        <td>{{ settlement.termination_date.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ settlement.termination_reason|replace('_', ' ')|title if settlement.termination_reason else '-' }}</td>
+                        <td>${{ "%.0f"|format(settlement.total_gross) }}</td>
+                        <td class="fw-semibold">${{ "%.0f"|format(settlement.total_net) }}</td>
+                        <td><span class="badge {% if settlement.status == 'draft' %}bg-secondary{% elif settlement.status == 'approved' %}bg-success{% else %}bg-primary{% endif %}">{{ settlement.status|title }}</span></td>
+                        <td><a href="{{ url_for('settlements.view_settlement', settlement_id=settlement.id) }}" class="btn btn-sm btn-outline-primary">Ver</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No hay finiquitos calculados.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

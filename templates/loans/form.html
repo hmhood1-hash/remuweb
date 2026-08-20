@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Préstamo - Sistema de Remuneraciones{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white"><h2 class="h4 mb-0">Crear préstamo</h2></div>
+            <div class="card-body">
+                <form method="POST" class="row g-3">
+                    <input type="hidden" name="csrf_token" value="">
+                    <div class="col-12">
+                        <label for="employee_id" class="form-label">Empleado</label>
+                        <select class="form-select" id="employee_id" name="employee_id" required>
+                            <option value="">Selecciona un empleado</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}">{{ employee.full_name }} · {{ employee.department or 'Sin departamento' }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="amount" class="form-label">Monto total</label>
+                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="1" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="total_installments" class="form-label">Número de cuotas</label>
+                        <input type="number" class="form-control" id="total_installments" name="total_installments" min="1" required>
+                    </div>
+                    <div class="col-12">
+                        <label for="purpose" class="form-label">Motivo</label>
+                        <input type="text" class="form-control" id="purpose" name="purpose" placeholder="Anticipo, emergencia, educación, etc.">
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('loans.list_loans') }}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar préstamo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

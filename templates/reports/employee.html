@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte por Empleado - Sistema de Remuneraciones{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Reporte de {{ employee.full_name }}</h2>
+        <p class="text-muted mb-0">Historial de remuneraciones y evolución salarial.</p>
+    </div>
+    <a href="{{ url_for('employees.view_employee', employee_id=employee.id) }}" class="btn btn-outline-secondary">Volver a ficha</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Nóminas</div><div class="fs-4 fw-bold">{{ payrolls|length }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Sueldo base</div><div class="fs-4 fw-bold">${{ "%.0f"|format(employee.base_salary) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Promedio neto</div><div class="fs-4 fw-bold">${{ "%.0f"|format((payrolls|sum(attribute='net_salary') / (payrolls|length)) if payrolls else 0) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card border-0 shadow-sm"><div class="card-body"><div class="text-muted small">Total líquido</div><div class="fs-4 fw-bold">${{ "%.0f"|format(payrolls|sum(attribute='net_salary')) }}</div></div></div></div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white"><h5 class="mb-0">Historial de nóminas</h5></div>
+    <div class="card-body">
+        {% if payrolls %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr><th>Período</th><th>Bruto</th><th>Descuentos</th><th>Neto</th><th>Estado</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for payroll in payrolls|sort(attribute='period_start', reverse=True) %}
+                    <tr>
+                        <td>{{ payroll.period_start.strftime('%d/%m/%Y') }} - {{ payroll.period_end.strftime('%d/%m/%Y') }}</td>
+                        <td>${{ "%.0f"|format(payroll.gross_salary) }}</td>
+                        <td>${{ "%.0f"|format(payroll.total_discounts) }}</td>
+                        <td class="fw-semibold">${{ "%.0f"|format(payroll.net_salary) }}</td>
+                        <td><span class="badge {% if payroll.status == 'draft' %}bg-secondary{% elif payroll.status == 'processed' %}bg-success{% else %}bg-primary{% endif %}">{{ payroll.status|title }}</span></td>
+                        <td><a href="{{ url_for('payroll.view_payroll', payroll_id=payroll.id) }}" class="btn btn-sm btn-outline-primary">Ver</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">El empleado no tiene nóminas registradas.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
